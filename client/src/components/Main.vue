@@ -11,7 +11,7 @@
         <v-btn v-if="!nextPageEmpty" v-on:click="(page += 1), getUser(user)">Next Page</v-btn>
         <v-container>
         <v-layout row wrap>
-        <v-flex xs4 v-for="item in info.items" :key="item.id">
+        <v-flex xs12 sm6 md6 lg4 xl-4 v-for="item in info.items" :key="item.id">
           <v-card tile hover>  
               <v-img v-on:click="getPlaylist(item); cardId = item.id" :src="item.images[0].url"/>
             <v-card-text v-if="playlist && cardId == item.id"> 
@@ -65,7 +65,7 @@ export default {
   methods: {
     getUser(user) {
       if (user != null) {
-        //let userURL = "https://server-xtvjqvbmlg.now.sh/spotify/user";
+        //let userURL = "https://spotifysongsterrapi.now.sh/spotify/user";
         let userURL = "http://localhost:3000/spotify/user";
         let page = this.page;
         const userJSON = {
@@ -88,7 +88,7 @@ export default {
       }
     },
     getPlaylist(arg) {
-      //let playlistURL = "https://server-xtvjqvbmlg.now.sh/spotify/playlist";
+      //let playlistURL = "https://spotifysongsterrapi.now.sh/spotify/playlist";
       let playlistURL = "http://localhost:3000/spotify/playlist";
       let playlistId = arg.id
       this.playlist = []
