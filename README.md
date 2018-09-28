@@ -1,1 +1,1 @@
-# Vue.js-Spotify-Songsterr
+# Vue.js-SpotifyTabFinder
