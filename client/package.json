@@ -6,9 +6,10 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "deploy": "npm run build && now --public && now alias spotifysongsterr"
+    "deploy": "npm run build && now --public && now alias"
   },
   "dependencies": {
+    "@tweenjs/tween.js": "^17.2.0",
     "axios": "^0.18.0",
     "vue": "^2.5.17",
     "vue-router": "^3.0.1",

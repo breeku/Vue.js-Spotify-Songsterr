@@ -1,5 +1,5 @@
 {
-    "name": "my-example-app",
+    "name": "playlistTabFinder",
     "type": "static",
     "static": {
       "public": "dist",
@@ -10,7 +10,7 @@
         }
       ]
     },
-    "alias": "vue-example",
+    "alias": "playlistTabFinder",
     "files": [
       "dist"
     ]
