@@ -8,6 +8,7 @@ Search for tabs from your Spotify playlists. Currently scrapes tab url and tunin
 #### Both:
 - [ ] Search for tabs from Ultimate Guitar too
 #### Frontend:
+- [ ] Prevent spam clicking
 - [ ] Filters (tuning, sort).
 #### Backend:
 - [ ] Prevent spam requesting/ check that theres no pending request with same body
