@@ -10,6 +10,7 @@ Search for tabs from your Spotify playlists. Currently scrapes tabs from songste
 #### Frontend:
 - [ ] Filters (tuning, sort).
 #### Backend:
+- [ ] Prevent spam clicking, or check that theres no pending request with same body
 - [ ] Make getpTracks run in parallel, would improve performance massively, and is necessary to scale.
 - [ ] Fix track artist check (currently gets artist wrong if theres more than one).
 
