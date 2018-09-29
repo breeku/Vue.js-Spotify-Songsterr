@@ -2,7 +2,7 @@
 
 ## [Link](https://playlisttabfinder.now.sh/)
 
-Search for tabs from your Spotify playlists. Currently scrapes tabs from songsterr and inserts them to database.
+Search for tabs from your Spotify playlists. Currently scrapes tab url and tuning from songsterr and inserts them to database.
 
 ### Goals:
 #### Both:
