@@ -9,18 +9,16 @@
     <v-container class="pt-5" fluid fill-height>
     <v-layout justify-center>
     <v-flex xs12 sm12 md10 lg8 xl-6>
-      <!--
       <transition name="slide-y-transition">
-      <img v-if="!info | userNotFound" class="logo" src="../assets/soundwaves.svg"/>
+      <h3 v-if="!info | userNotFound">| Search for guitar tabs from your spotify playlists! |</h3>
       </transition>
-      -->
       <div>
       <h3 class="left">Total <br><hr>{{ total }}</h3>
       <h3 class="right">Tabs <br><hr>{{ tabs }}</h3>
       </div>
       <input v-model="user" placeholder="Spotify User">
       <v-btn depressed outline dark large v-on:click="getUser(user)">Search</v-btn>
-      <h5 class="pt-3">Current playlist size limit: 50<br>
+      <h5 class="pt-3">Current playlist size limit: 40<br>
       Will be upped later.</h5>
       <v-container v-if="loadingUser">
         <v-progress-circular :size="100" :width="7" indeterminate color="purple"/>
@@ -149,19 +147,24 @@ export default {
     },
     getPlaylist(arg) {
       //Get Songs
+      if (this.loadingPlaylist != true) {
+      this.loadingPlaylist = true;
       let playlistURL = "https://stark-beyond-77127.herokuapp.com/spotify/playlist";
       //let playlistURL = "http://localhost:3000/spotify/playlist";
       let playlistId = arg.id;
       this.playlist = [];
-      this.loadingPlaylist = true;
       const playlistJSON = {
         id: playlistId
       };
       axios.post(playlistURL, playlistJSON).then(response => {
+        this.alreadyLoading = false;
         this.loadingPlaylist = false;
         this.playlist = response.data;
       });
+    } else {
+      // Already loading tracks
     }
+  }
   }
 };
 </script>

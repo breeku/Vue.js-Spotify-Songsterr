@@ -10,7 +10,7 @@
         }
       ]
     },
-    "alias": "playlistTabFinder",
+    "alias": "playlisttabfinder",
     "files": [
       "dist"
     ]
