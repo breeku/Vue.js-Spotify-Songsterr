@@ -8,10 +8,9 @@ Search for tabs from your Spotify playlists. Currently scrapes tab url and tunin
 #### Both:
 - [ ] Search for tabs from Ultimate Guitar too
 #### Frontend:
-- [ ] Prevent spam clicking
+- [x] Prevent spam clicking
 - [ ] Filters (tuning, sort).
 #### Backend:
-- [ ] Prevent spam requesting/ check that theres no pending request with same body
 - [ ] Make getpTracks run in parallel, would improve performance massively, and is necessary to scale.
 - [ ] Fix track artist check (currently gets artist wrong if theres more than one).
 
