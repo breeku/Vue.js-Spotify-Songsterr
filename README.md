@@ -12,6 +12,7 @@ Search for tabs from your Spotify playlists. Currently scrapes tab url and tunin
 - [x] Prevent spam clicking
 - [x] Search history
 - [x] Smoother transitions (some still need work)
+- [ ] Spotify play button
 - [ ] Filters (tuning, sort).
 #### Backend:
 - [ ] Make getpTracks run in parallel, would improve performance massively, and is necessary to scale.
