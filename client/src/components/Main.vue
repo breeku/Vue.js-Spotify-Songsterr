@@ -2,28 +2,36 @@
 <div class="pb-5">
 <v-toolbar v-if="info && !userNotFound" flat class="foooter">
   <v-layout justify-center row wrap>
-    <v-btn flat dark href="https://github.com/breeku/Vue.js-SpotifyTabFinder" target="!blank">Github</v-btn>
-    <v-btn flat dark href="http://matiasmakela.com" target="!blank">Author</v-btn>
+      <h4>Total <br><hr>{{ total }}</h4>
+      <v-btn flat dark href="https://github.com/breeku/Vue.js-SpotifyTabFinder" target="!blank">Github</v-btn>
+      <v-btn flat dark href="http://matiasmakela.com" target="!blank">Author</v-btn>
+      <h4>Tabs <br><hr>{{ tabs }}</h4>
   </v-layout>
 </v-toolbar>
-    <v-container class="pt-5" fluid fill-height>
+    <v-container fluid fill-height>
     <v-layout justify-center>
     <v-flex xs12 sm12 md10 lg8 xl-6>
-      <transition name="slide-y-transition">
-      <h3 v-if="!info | userNotFound">| Search for guitar tabs from your spotify playlists! |</h3>
-      </transition>
-      <div>
-      <h3 class="left">Total <br><hr>{{ total }}</h3>
-      <h3 class="right">Tabs <br><hr>{{ tabs }}</h3>
-      </div>
-      <input v-model="user" placeholder="Spotify User">
-      <v-btn depressed outline dark large v-on:click="getUser(user)">Search</v-btn>
+      <v-form id="smoothTransition" v-on:submit.prevent="getUser(user)" :class="[info && !userNotFound ? 'formnoPadding' : 'formlargePadding']">
+          <div transition-name="fade-transition" v-if="!info | userNotFound" class="mainText">
+          <h1 class="font-weight-thin">Playlist Tab Finder</h1>
+          <h2 class="font-weight-thin font-italic">Search for guitar tabs from your spotify playlists.</h2>
+          </div>
+          <p v-if="searchArray != ''" class="caption mb-0">Recently searched..
+          <transition-group name="scale-transition" tag="p"> 
+          <v-chip v-for="searched in searchArray" :key="searched" label outline color="primary" @click="getUser(searched)">{{ searched }}</v-chip>
+          </transition-group>
+          </p>
+        <input autocomplete="off" id="smoothTransition" v-model="user" placeholder="User" :class="[info && !userNotFound ? 'inputSmall' : 'input']" >
+        <v-btn depressed outline dark v-on:click="getUser(user)" :class="[info && !userNotFound ? 'mt-0' : 'mt-5']">Search</v-btn>
+      </v-form>
+      <!--
       <h5 class="pt-3">Current playlist size limit: 40<br>
       Will be upped later.</h5>
+      -->
       <v-container v-if="loadingUser">
         <v-progress-circular :size="100" :width="7" indeterminate color="purple"/>
       </v-container>
-      <h1 v-if="userNotFound" class="display-4 pt-3">User not found!</h1>
+        <p v-if="userNotFound" class="display-1 font-weight-thin pt-5">User not found!</p>
       <div v-else-if="info && !userNotFound">
         <v-btn depressed outline dark v-if="page >= 1" v-on:click="(page -= 1),nextPageEmpty = false, getUser(user)">Previous Page</v-btn>
         <v-btn depressed outline dark v-if="!nextPageEmpty" v-on:click="(page += 1), getUser(user)">Next Page</v-btn>
@@ -68,8 +76,10 @@
     </v-container>
   <v-footer absolute class="pa-4 foooter">
     <v-layout justify-center row wrap>
+      <h4>Total <br><hr>{{ total }}</h4>
       <v-btn flat dark href="https://github.com/breeku/Vue.js-SpotifyTabFinder" target="!blank">Github</v-btn>
       <v-btn flat dark href="http://matiasmakela.com" target="!blank">Author</v-btn>
+      <h4>Tabs <br><hr>{{ tabs }}</h4>
     </v-layout>
   </v-footer>
 </div>
@@ -93,7 +103,8 @@ export default {
       loadingPlaylist: false,
       total: 0,
       tabs: 0,
-      dialog: false
+      dialog: false,
+      searchArray: []
     };
   },
   filters: {
@@ -107,18 +118,34 @@ export default {
   },
   mounted() {
     this.amountofTabs();
+    if (localStorage.getItem("searchedUser")) {
+      this.getlocalStorage()
+    }
   },
   methods: {
     amountofTabs() {
-      let countURL = "https://stark-beyond-77127.herokuapp.com/spotify/count"
+      let countURL = "https://stark-beyond-77127.herokuapp.com/spotify/count";
       //let countURL = "http://localhost:3000/spotify/count";
       axios.get(countURL).then(response => {
         this.total = response.data.total;
         this.tabs = response.data.tabs;
       });
     },
+    getlocalStorage() {
+      let localStorageUsers = JSON.parse(localStorage.getItem("searchedUser"));
+      this.searchArray = localStorageUsers
+    },
     getUser(user) {
+      this.userNotFound = false;
       if (user != null && user != "") {
+        if (this.searchArray.includes(user)) {
+        } else if (this.searchArray.length <= 4) {
+          this.searchArray.push(user);
+        } else {
+          this.searchArray.unshift(user);
+          this.searchArray.pop()
+        }
+        localStorage.setItem("searchedUser", JSON.stringify(this.searchArray));
         let userURL = "https://stark-beyond-77127.herokuapp.com/spotify/user";
         //let userURL = "http://localhost:3000/spotify/user";
         let page = this.page;
@@ -148,34 +175,52 @@ export default {
     getPlaylist(arg) {
       //Get Songs
       if (this.loadingPlaylist != true) {
-      this.loadingPlaylist = true;
-      let playlistURL = "https://stark-beyond-77127.herokuapp.com/spotify/playlist";
-      //let playlistURL = "http://localhost:3000/spotify/playlist";
-      let playlistId = arg.id;
-      this.playlist = [];
-      const playlistJSON = {
-        id: playlistId
-      };
-      axios.post(playlistURL, playlistJSON).then(response => {
-        this.alreadyLoading = false;
-        this.loadingPlaylist = false;
-        this.playlist = response.data;
-      });
-    } else {
-      // Already loading tracks
+        this.loadingPlaylist = true;
+        let playlistURL =
+          "https://stark-beyond-77127.herokuapp.com/spotify/playlist";
+        //let playlistURL = "http://localhost:3000/spotify/playlist";
+        let playlistId = arg.id;
+        this.playlist = [];
+        const playlistJSON = {
+          id: playlistId
+        };
+        axios.post(playlistURL, playlistJSON).then(response => {
+          this.alreadyLoading = false;
+          this.loadingPlaylist = false;
+          this.playlist = response.data;
+        });
+      } else {
+        // Already loading tracks
+      }
     }
-  }
   }
 };
 </script>
 
 <style scoped>
-input {
+.input {
   width: 100%;
   text-align: center;
-  font-size: 8vw;
+  font-size: 12em;
   padding: 1rem;
-  text-shadow: 0 0 10px black;
+}
+.inputSmall {
+  width: 100%;
+  text-align: center;
+  font-size: 8em;
+  padding-bottom: 0.5rem;
+}
+#smoothTransition {
+  transition: 1s;
+}
+.formlargePadding {
+  padding-top: calc(18vh - 4em);
+}
+.formnoPadding {
+  padding-top: 0;
+}
+.mainText {
+  padding-bottom: 4em;
 }
 .logo {
   min-width: 200px;
@@ -186,5 +231,13 @@ input {
 }
 >>> .v-dialog {
   box-shadow: 0 0 15px black !important;
+}
+@media only screen and (max-width: 550px) {
+    .input {
+      font-size: 8em
+    }
+    .inputSmall {
+      font-size: 4em;
+    }
 }
 </style>

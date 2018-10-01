@@ -13,7 +13,7 @@ export default {
   },
   methods: {
   track () {
-    this.$ga.page('/')
+    this.$ga.page('')
   },
 }
 }
@@ -24,7 +24,7 @@ Main {
   max-height: 100%;
   background: radial-gradient(ellipse at bottom, #1b2735 0%,#090a0f 100%);
   background-repeat: cover;
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: 'Roboto', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
