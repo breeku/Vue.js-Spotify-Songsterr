@@ -22,7 +22,7 @@ app.use(cors());
 
 
 app.listen((process.env.PORT || 5000), () => {
-  console.log("Live on");
+  console.log("Live");
 });
 
 const limiter = rateLimit({
@@ -31,6 +31,11 @@ const limiter = rateLimit({
 });
 
 app.use(limiter); // should limit different paths differently
+
+const getTrackLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 80 // limit each IP to 30 requests per windowMs
+});
 
 function spotifyAuth() {
   spotifyApi.clientCredentialsGrant().then(
@@ -59,8 +64,8 @@ app.get("/spotify/count", async (req, res) => {
     console.log(e)
   }
 })
-app.post("/spotify/user", (req, res) => {
-  spotifyAuth();
+app.post("/spotify/user", async (req, res) => {
+  await spotifyAuth();
   let user = req.body.user;
   let page = req.body.page;
   if (page == 0) {
@@ -126,12 +131,10 @@ app.post("/spotify/playlist", async (req, res) => {
     console.log(e)
   }
 });
-var amountOfTracks = 0;
 async function getpTracks(args) {
   const result = [];
-  const data = await spotifyApi.getPlaylistTracks(args, { limit: 50 });
+  const data = await spotifyApi.getPlaylistTracks(args, { limit: 100 });
   let temp = data.body.items;
-  amountOfTracks = temp.length;
   for (const {
     track: { name: trackName, artists }
   } of temp) {
@@ -142,7 +145,6 @@ async function getpTracks(args) {
   return result;
 }
 async function dbChecks(trackName, trackArtist, result = []) {
-  const url = "https://www.songsterr.com/a/wa/bestMatchForQueryString?s=";
   try {
     const response = await dbSongsterr.findOne({
       artist: trackArtist,
@@ -162,18 +164,36 @@ async function dbChecks(trackName, trackArtist, result = []) {
         tuning: response.tuning
       });
     } else {
-      //if no results found, go webscrape
-      const urli = url + trackName + "&a=" + trackArtist; // url constructor
-      await scrapeUrl(urli, trackName, trackArtist, result);
+      result.push({
+        artist: trackArtist,
+        track: trackName,
+      });
+      dbSongsterr.insert({
+        artist: trackArtist,
+        track: trackName,
+      });
+      //if no results found, insert empty
     }
   } catch (error) {
     console.log("Error: " + error);
   }
   return result;
 }
-async function scrapeUrl(url, track, artist, result = []) {
+app.post("/spotify/gettab", getTrackLimiter, async (req, res) => {
+  try {
+  var t0 = performance.now();
+  res.send(await scrapeUrl(req.body.artist, req.body.track));
+  var t1 = performance.now();
+  console.log("Call took " + (t1 - t0) + " milliseconds.");
+  } catch(e) {
+    console.log(e)
+  }
+});
+async function scrapeUrl(artist, track, result = []) {
+  const songsterrUrl = "https://www.songsterr.com/a/wa/bestMatchForQueryString?s=";
+  const url = songsterrUrl + track + "&a=" + artist; // url constructor
+  console.log(url)
   console.log(artist + " ||| " + track);
-  console.log(result.length + " / " + amountOfTracks);
   try {
     const res = await rp({
       url,
@@ -197,12 +217,18 @@ async function scrapeUrl(url, track, artist, result = []) {
         url: url,
         tuning: tuning
       });
-      dbSongsterr.insert({
+      dbSongsterr.findOneAndUpdate(
+        {
+        artist: artist,
+        track: track 
+        },
+        {
         artist: artist,
         track: track,
         url: url,
         tuning: tuning
-      });
+        }
+      );
     } else {
       result.push({
         // if didnt pass artist name check then
@@ -211,12 +237,18 @@ async function scrapeUrl(url, track, artist, result = []) {
         url: false,
         tuning: false
       });
-      dbSongsterr.insert({
+      dbSongsterr.findOneAndUpdate(
+        {
+        artist: artist,
+        track: track 
+        },
+        {
         artist: artist,
         track: track,
         url: false,
         tuning: false
-      });
+        }
+      );
     }
   } catch (error) {
     console.log("Site crawl fail");
