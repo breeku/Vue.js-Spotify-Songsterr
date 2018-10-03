@@ -6,16 +6,16 @@ Search for tabs from your Spotify playlists. Currently scrapes tab url and tunin
 
 ### Goals:
 #### Both:
-- [ ] Analytics
+- [x] Analytics
 - [ ] Search for tabs from Ultimate Guitar too
+- [ ] Get all tabs for current page
 #### Frontend:
 - [x] Prevent spam clicking
 - [x] Search history
 - [x] Smoother transitions (some still need work)
+- [x] Filters (tuning, sort).
 - [ ] Spotify play button
-- [ ] Filters (tuning, sort).
 #### Backend:
-- [ ] Make getpTracks run in parallel, would improve performance massively, and is necessary to scale.
 - [ ] Fix track artist check (currently gets artist wrong if theres more than one).
 
 > Created with Created with Vue.js, Node.js, Express and MongoDB
