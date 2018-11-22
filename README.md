@@ -6,7 +6,7 @@ Search for tabs from your Spotify playlists. Currently scrapes tab url and tunin
 
 ### Goals:
 #### Both:
-- [x] Analytics
+- [ ] Analytics
 - [ ] Search for tabs from Ultimate Guitar too (no api and they seem to limit requests)
 - [ ] Get all tabs for current page
 #### Frontend:
